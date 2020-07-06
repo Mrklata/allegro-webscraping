@@ -3,10 +3,9 @@ from selenium import webdriver
 from selenium.webdriver.support.select import Select
 import pandas as pd
 
-basic_df = pd.DataFrame(columns=['Nazwa, Cena'])
-
-filename = input("nazwa pliku excelowego z rozszeżeniem !!!")
-column_name = input("nazwa kolumny w excelu")
+data = []
+filename = input("Nazwa pliku excelowego z rozszeżeniem !!! -->  ")
+column_name = input("Nazwa kolumny w excelu -->  ")
 df = pd.read_excel(filename, sheet_name=0)
 my_list = df[column_name].tolist()
 
@@ -38,9 +37,17 @@ for i in my_list:
     prices_lst = []
     for num in range(10):
         prices_lst.append(prices[num].text)
-
     prices_int = []
     for price in prices_lst:
-        prices_int.append(float(price.replace(" zł", "").replace(",", ".")))
+        if price != '':
+            prices_int.append(float(price.replace(" zł", "").replace(",", ".")))
+        else:
+            continue
+    data.append([i, sorted(prices_int)[0], sorted(prices_int)[1], sorted(prices_int)[2]])
+    print([i, sorted(prices_int)[0], sorted(prices_int)[1], sorted(prices_int)[2]])
 
-    print(sorted(prices_int))
+    driver.quit()
+
+data_frame = pd.DataFrame(data, columns=['Nazwa', 'Cena 1', 'Cena 2', 'Cena 3'])
+
+data_frame.to_excel('output.xlsx')
