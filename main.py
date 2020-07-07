@@ -1,16 +1,20 @@
 from time import sleep
 from selenium import webdriver
 from selenium.webdriver.support.select import Select
+from selenium.webdriver.firefox.options import Options
 import pandas as pd
 
 data = []
-filename = input("Nazwa pliku excelowego z rozszeżeniem !!! -->  ")
+filename = input("Nazwa pliku excelowego bez rozszerzenia !!! -->  ")
 column_name = input("Nazwa kolumny w excelu -->  ")
+filename = f'{filename}.xlsx'
 df = pd.read_excel(filename, sheet_name=0)
 my_list = df[column_name].tolist()
 
 for i in my_list:
-    driver = webdriver.Firefox()
+    options = Options()
+    options.add_argument('--headless')
+    driver = webdriver.Firefox(options=options)
 
     driver.get('https://allegro.pl/')
 
@@ -22,10 +26,10 @@ for i in my_list:
     s_check = driver.find_element_by_xpath('//select[@class="_1h7wt _k70df _7qjq4 _27496_3VqWr"]/option')
     s2 = Select(s1)
     s2.select_by_index(1)
-
+    span_check = driver.find_element_by_xpath('//span[.="nowe"]').click()
     count = 1
     for _ in range(10):
-        if s_check.text == ' cena: od najniższej ':
+        if s_check.text == ' cena: od najniższej ' and span_check.text == 'nowe':
             break
         elif count == 10:
             print('Timeout error')
@@ -40,7 +44,7 @@ for i in my_list:
     prices_int = []
     for price in prices_lst:
         if price != '':
-            prices_int.append(float(price.replace(" zł", "").replace(",", ".")))
+            prices_int.append(float(price.replace(" zł", "").replace(",", ".").replace(' ', '')))
         else:
             continue
     data.append([i, sorted(prices_int)[0], sorted(prices_int)[1], sorted(prices_int)[2]])
