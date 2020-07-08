@@ -61,7 +61,7 @@ def main():
 
     data_frame = pd.DataFrame(data, columns=['Nazwa', 'Cena 1', 'Cena 2', 'Cena 3'])
 
-    data_frame.to_excel(f'{filename}_output.xlsx')
+    data_frame.to_excel(f'{filename.replace(".xmls", "")}_output.xlsx')
 
 
 if __name__ == '__main__':
